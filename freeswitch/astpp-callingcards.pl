@@ -475,7 +475,8 @@ sub dialout() {           # Rig up the LCR stuff and do the outbound dialing.
             $session->execute( "export", "accountcode=$cardinfo->{accountcode}" );
             $session->execute( "export", "callingcard=$cardinfo->{cardnumber}" );
         }
-        $session->execute( "bridge", "$data_string" );
+#        $session->execute( "bridge", "$data_string" );
+	$session->execute( "bridge", "$xml_string" );
         return 1;
     }
 }

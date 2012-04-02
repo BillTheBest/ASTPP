@@ -1,29 +1,7 @@
 <input name="mode" value="Calling Cards" type="hidden">
 <form method="post" action="/cgi-bin/astpp/astpp-users.cgi?mode=Calling%20Cards" enctype="multipart/form-data">
-View Card: <TMPL_VAR NAME="card_number">
-<table class="default">
-	<tr class="header">
-		<td>Destination</td>
-	        <td>Disposition</td>
-	        <td>CallerID</td>
-	        <td>Starting Time</td>
-	       	<td>Length in Seconds</td>
-	        <td>Cost</td>
-	</tr>
-	<TMPL_LOOP NAME="cdr_list">
-		<tr>
-                        <td><TMPL_VAR NAME="destination"></td> 
-                        <td><TMPL_VAR NAME="disposition"></td> 
-                        <td><TMPL_VAR NAME="callerid"></td> 
-                        <td><TMPL_VAR NAME="callstart"></td> 
-                        <td><TMPL_VAR NAME="billseconds"></td> 
-                        <td><TMPL_VAR NAME="cost"></td> 
-		</tr>
-	</TMPL_LOOP>
-</table>
-
 List Calling Cards<br>
-<table class="default">
+<table class="default" width='80%'>
 	<tr class="header">
 		<td>Card Number</td>
 		<td>Pin</td>
@@ -50,6 +28,28 @@ List Calling Cards<br>
                         <td><TMPL_VAR NAME="expiry"></td> 
                         <td><TMPL_VAR NAME="inuse"></td> 
                         <td><TMPL_VAR NAME="cardstat"></td>
+		</tr>
+	</TMPL_LOOP>
+</table>
+<br/>
+View Card: <TMPL_VAR NAME="card_number">
+<table class="default" width='80%'>
+	<tr class="header">
+		<td>Destination</td>
+	        <td>Disposition</td>
+	        <td>CallerID</td>
+	        <td>Starting Time</td>
+	       	<td>Length in Seconds</td>
+	        <td>Cost</td>
+	</tr>
+	<TMPL_LOOP NAME="cdr_list">
+		<tr>
+                        <td><TMPL_VAR NAME="destination"></td> 
+                        <td><TMPL_VAR NAME="disposition"></td> 
+                        <td><TMPL_VAR NAME="callerid"></td> 
+                        <td><TMPL_VAR NAME="callstart"></td> 
+                        <td><TMPL_VAR NAME="billseconds"></td> 
+                        <td><TMPL_VAR NAME="cost"></td> 
 		</tr>
 	</TMPL_LOOP>
 </table>

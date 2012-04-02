@@ -20,7 +20,7 @@ use Locale::Language;
 use Locale::gettext_pp qw(:locale_h);
 use lib './lib', '../lib';
 use warnings;
-use strict;
+#use strict;
 require "/usr/local/astpp/astpp-common.pl";
 $ENV{'LANGUAGE'} = "en";    # de, es, br - whatever
 print STDERR "Interface language is set to: $ENV{'LANGUAGE'}\n";
@@ -48,12 +48,13 @@ foreach my $param ( param() ) {
 &initialize();
 
 @cardlist = &list_accounts($astpp_db);
-
+$params->{minbalance} = 1;
 foreach my $card (@cardlist) {
     my $cardinfo = &get_account( $astpp_db,  $card );
-    my $balance  = &accountbalance( $astpp_db, $card );
-    $balance = $balance / 10000;
-    if ( ($balance * -1) <= $params->{minbalance} && $cardinfo->{posttoexternal} == 0 )
+    my $balance  = &accountbalance( $astpp_db, $card );       
+    $balance = $balance / 10000;    
+#     if ( ($balance * -1) <= $params->{minbalance} && $cardinfo->{posttoexternal} == 0 )
+    if ( ($balance * -1) <= $params->{minbalance})
     {
         print "\n Card Number: $card Balance: $balance\n";
         &email_low_balance( $config, $cardinfo->{email},

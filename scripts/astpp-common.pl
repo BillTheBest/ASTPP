@@ -13,7 +13,7 @@ use Text::Template;
 use POSIX;
 use POSIX qw(strftime);
 use DBI;
-use strict;
+#use strict;
 use warnings;
 use Locale::gettext_pp qw(:locale_h);
 use Mail::Sendmail;
@@ -756,8 +756,9 @@ sub email_new_invoice() {
 # This needs to be updated and moved to templates which reside in the database and can be
 # configured per reseller.
 sub email_low_balance() {
-    my ( $astpp_db, $reseller,$config, $email, $balance ) = @_;
-    $email = $config->{company_email} if $config->{user_email} == 0;
+#     my ( $astpp_db, $reseller,$config, $email, $balance ) = @_;
+    my ( $config, $email, $balance ) = @_;
+    $email = $config->{company_email} if $config->{user_email} == 0;    
     my %mail = (
         To         => $email,
         From       => $config->{company_email},
@@ -766,7 +767,7 @@ sub email_low_balance() {
         'X-Mailer' => "Mail::Sendmail version $Mail::Sendmail::VERSION",
     );
     $mail{'Message : '} =
-"Your VOIP account with $config->{company_name} has a balance of \$$balance .\n"
+	"Your VOIP account with $config->{company_name} has a balance of \$$balance .\n"
       . "Please visit our website to refill your account to ensure uninterrupted service.\n"
       . "For information please visit $config->{company_website} or \n"
       . "contact our support department at $config->{company_email}\n"
@@ -2159,17 +2160,17 @@ sub accounts_total_balance() {
     my ($astpp_db,$reseller) = @_;
     my ( $tmp, $sql, $row, $debit, $credit, $balance, $posted_balance );
     if (!$reseller || $reseller eq "") {
-    $tmp = "SELECT SUM(debit) FROM cdrs WHERE status NOT IN (1, 2)";
-    $sql = $astpp_db->prepare($tmp);
-    $sql->execute;
-    $row   = $sql->fetchrow_hashref;
-    $debit = $row->{"SUM(debit)"};
-    $tmp   = "SELECT SUM(credit) FROM cdrs WHERE status NOT IN (1, 2)";
-    $sql   = $astpp_db->prepare($tmp);
-    $sql->execute;
-    $row   = $sql->fetchrow_hashref;
-    $debit = $row->{"SUM(credit)"};
-    $tmp   = "SELECT SUM(balance) FROM accounts WHERE reseller = ''";
+      $tmp = "SELECT SUM(debit) FROM cdrs WHERE status NOT IN (1, 2)";
+      $sql = $astpp_db->prepare($tmp);
+      $sql->execute;
+      $row   = $sql->fetchrow_hashref;
+      $debit = $row->{"SUM(debit)"};
+      $tmp   = "SELECT SUM(credit) FROM cdrs WHERE status NOT IN (1, 2)";
+      $sql   = $astpp_db->prepare($tmp);
+      $sql->execute;
+      $row   = $sql->fetchrow_hashref;
+      $credit = $row->{"SUM(credit)"};
+      $tmp   = "SELECT SUM(balance) FROM accounts WHERE reseller = ''";
     } else {
     	$tmp   = "SELECT SUM(balance) FROM accounts WHERE reseller = " . $astpp_db->quote($reseller);
     }
@@ -2216,7 +2217,7 @@ sub accountbalance() {
     $sql->finish;
     if ( !$credit )         { $credit         = 0; }
     if ( !$debit )          { $debit          = 0; }
-    if ( !$posted_balance ) { $posted_balance = 0; }
+    if ( !$posted_balance ) { $posted_balance = 0; }    
     $balance = ( $debit - $credit + $posted_balance );
     return $balance;
 }
@@ -3563,7 +3564,7 @@ sub count_unbilled_cdrs() {
     my ( $sql, $count, $record );
     $sql =
       $cdr_db->prepare( "SELECT COUNT(*) FROM $config->{cdr_table} WHERE cost = 'error' OR "
-          . "accountcode IN (" . $account . ") AND cost ='none'" );
+          . "accountcode IN (" . $account . "0) AND cost ='none'" );      
     $sql->execute;
     $record = $sql->fetchrow_hashref;
     $count  = $record->{"COUNT(*)"};
@@ -3893,7 +3894,7 @@ $sound->{sub_currency_plural}      = $location . "astpp-cents.gsm";         #cen
 $sound->{per}                      = $location . "astpp-per.gsm";           #per
 $sound->{minute}                   = $location . "astpp-minute.gsm";        #Minute
 #Changed By Joseph Watson
-#$sound->{minutes}                  = $location . "astpp-minutes.gsm";       #Minutes
+# $sound->{minutes}                  = $location . "astpp-minutes.gsm";       #Minutes
 $sound->{minutes}                  = $location . "minutes.wav";       #Minutes
 $sound->{second}                   = $location . "astpp-second.gsm";        #Second
 $sound->{seconds}                  = $location . "astpp-seconds.gsm";       #Seconds
@@ -4490,7 +4491,7 @@ sub vendor_process_rating() {  #Rate Vendor calls.
 sub update_list_cards() {
     my ($astpp_db, $config, $sweep) = @_;
     my ( $sql, @cardlist, $row );
-    if (!$sweep || $sweep eq "" ) {
+    if ((!$sweep || $sweep eq "") && $sweep != 0) {
         $sql =
           $astpp_db->prepare(
 "SELECT number FROM accounts WHERE status < 2 AND (reseller IS NULL OR reseller = '') AND posttoexternal = 0 "

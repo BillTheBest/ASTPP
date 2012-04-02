@@ -43,8 +43,8 @@ use vars qw(@output @modes $body $menu $astpp_db $params
 @output = ("STDERR");
 @modes  = (
 	gettext("Home"), gettext("Account"), gettext("Calling Cards"),
-	gettext("ANI Mapping"), gettext("DIDs"),
-	gettext("Logout"), gettext("Report")
+	gettext("ANI Mapping"), gettext("DIDs")
+# 	,gettext("Report")
 );
 
 my %sweeplist = (
@@ -156,19 +156,19 @@ sub build_menu_ts() {
 	my $i = 0;
 	foreach $tmp (@modes) {
 		$body .=
-"<div class=\"ts_ddm\" name=tt$i id=tt$i style=\"visibility:hidden;width:150;background-color:#efefef;\"onMouseover=\"clearhidemenu()\" onMouseout=\"dynamichide(event)\"><table width=100% border=0 cellspacing=0 cellpadding=0>";
+"<div class=\"ts_ddm\" name=tt$i id=tt$i style=\"visibility:hidden;\"onMouseover=\"clearhidemenu()\" onMouseout=\"dynamichide(event)\"><table width=100\% border=0 cellspacing=0 cellpadding=0>";
 		my $j = 0;
 		$body .= "</table></div>";
 		$i++;
 	}
-	$body .= "<table width=600 cellpadding=0 class=ts_menu><tr>";
+	$body .= "<table cellpadding=0 class=ts_menu><tr><td><table class='menu_table'><tr><td>|</td>\n";
 	$i = 0;
 	foreach $tmp (@modes) {
 		$body .=
-"<td name=t$i id=t$i><a href=\"?mode=$tmp\"  onmouseover='light_on(t$i);dropdownmenu(this, event,\"tt$i\");' onmouseout='light_off(t$i);delayhidemenu();'>$tmp</a></td>\n";
+"<td align='center' style='width:250px;font-size:14px;' name=t$i id=t$i><a href=\"?mode=$tmp\"  onmouseover='light_on(t$i);dropdownmenu(this, event,\"tt$i\");' onmouseout='light_off(t$i);delayhidemenu();'><b>$tmp</b></a></td><td>|</td>\n";
 		$i++;
 	}
-	$body .= "</tr></table>";
+	$body .= "</tr></table></td></tr></table>";
 	return $body;
 }
 
@@ -209,9 +209,9 @@ sub build_callback() {
 
 sub build_home() {
 	my $tmp =
-	  "<table width=80%><tr><td>"
+	  "<table width=100%><tr><td align='center'>"
 	  . gettext(
-		"Welcome to ASTPP.  Please select a function from the menu above.")
+		"<br/><br/><br/><b>Welcome to ASTPP. <br/>Please select a function from the menu above.</b><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>")
 	  . "</td></tr></table>";
 	return $tmp;
 }
@@ -443,8 +443,8 @@ sub build_list_cards() {
 		$sql =
 		  $astpp_db->prepare( "SELECT * FROM callingcards WHERE cardnumber = "
 			  . $astpp_db->quote( $params->{number} )
-			  . " AND account = "
-			  . $astpp_db->quote( $params->{username} ) );
+			  . " AND ( account = "
+			  . $astpp_db->quote( $params->{username} )." OR (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} )."))" );
 		$sql->execute
 		  || return gettext(
 			"Something is wrong with the callingcards database!")
@@ -472,13 +472,13 @@ sub build_list_cards() {
 			push( @cdr_list, \%row );
 		}
 		$template->param(cdr_list => \@cdr_list);
-		$params->{action} eq gettext("Information...");
-	}
+		$params->{action} = gettext("Information...");
+	}	
 	if ( $params->{action} eq gettext("Information...") ) {
 		my $tmp = 
-			    "SELECT cardnumber FROM callingcards WHERE account = "
-			  . $astpp_db->quote( $params->{username} )
-			  . " AND status < 2";
+			    "SELECT cardnumber FROM callingcards WHERE (account = "
+			  . $astpp_db->quote( $params->{username} )  
+			  . " OR (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} ).")) AND status < 2";		  		  
 		print STDERR "$tmp \n" if $config->{debug} == 1;
 		$sql =
 		  $astpp_db->prepare($tmp);
@@ -492,9 +492,9 @@ sub build_list_cards() {
 		  if ( $config->{debug} eq "YES" );
 		$sql->finish;
 		print STDERR "$tmp \n" if $config->{debug} == 1;
-		$tmp = "SELECT * FROM callingcards WHERE account = "
+		$tmp = "SELECT * FROM callingcards WHERE ( account = "
 			  . $astpp_db->quote( $params->{username} )
-			  . " AND status < 2 ORDER BY id limit $params->{limit} , $results_per_page";
+			  . " OR (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} ).")) AND status < 2 ORDER BY id limit $params->{limit} , $results_per_page";
 		print STDERR "$tmp \n" if $config->{debug} == 1;
 		$sql =
 		  $astpp_db->prepare($tmp); 
@@ -650,9 +650,9 @@ sub build_dids() {
 	my $accountinfo = &get_account( $astpp_db, $params->{username} );
 	my @availabledids = &list_available_dids( $astpp_db, $params->{username} );
 	$body = start_form
-	  . "<table class=\"default\"><tr class=\"header\"><td>"
+	  . "<table class=\"default\" width='40%'><tr class=\"header\"><td colspan='2'>"
 	  . hidden( -name => 'mode', -value => gettext("DIDs") )
-	  . gettext("Order DID") . "</td></tr>" . "<tr><td>"
+	  . gettext("Order DID") . "</td></tr>" . "<tr class='rowone'><td>"
 	  . popup_menu(
 		-name   => "did_list",
 		-values => \@availabledids
@@ -665,7 +665,7 @@ sub build_dids() {
 	  . "</td></tr></table>";
 	$body .= $status;
 	$body .=
-	    "<table class=\"default\">"
+	    "<table class=\"default\" width='90%'>"
 	  . "<tr class=\"header\"><td>"
 	  . gettext("Number")
 	  . "</td><td>"
@@ -853,7 +853,7 @@ sub build_body() {
 	return &build_callback()     if $params->{mode} eq gettext("Callback");
 	return &build_ani_map()      if $params->{mode} eq gettext("ANI Mapping");
 	return &build_refills()      if $params->{mode} eq gettext("Refills");
-	return gettext("Not Available!");
+	return gettext("Not Available For Users!");
 }
 #######################Program Starts Here####################
 foreach my $param ( param() ) {
@@ -930,8 +930,9 @@ while ( my $record = $sql->fetchrow_hashref ) {
     print $body;
 }
 else {
-$body = "<table width=100\%><tr><td colspan=2 align=center>$status</td></tr>"
-	  . "<tr><td colspan=2 align=center>"
+    $body =
+"<table class=\"default\" width=100\%><tr><td colspan=2 align=center></td></tr>\n"
+	  . "<tr><td colspan=2 align=center  class='login'>"
 	  . gettext("Please Login Now")
 	  . "</td></tr>"
 	  . startform . "<tr><td width=50\% align=right>"
@@ -945,7 +946,7 @@ $body = "<table width=100\%><tr><td colspan=2 align=center>$status</td></tr>"
 	  . "</td></tr>" . "<tr><td colspan=2 align=center>"
 	  . submit( -name => 'mode', -value => gettext("Login") )
 	  . reset()
-	  . "</td></tr>";
+	  . "<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/></td></tr></table>\n";
 }
 
 $template->param(body => $body);
@@ -958,6 +959,7 @@ $template->param(company_name => $config->{company_name});
 $template->param(company_website => $config->{company_website});
 $template->param(company_slogan => $config->{company_slogan});
 $template->param(company_logo => $config->{company_logo});
+$template->param(version         => $config->{version} );
 my $generation_time = tv_interval ($starttime);
 $template->param(time_gen => $generation_time);
 my $time_now = localtime time;

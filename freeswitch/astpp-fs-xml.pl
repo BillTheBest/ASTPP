@@ -20,7 +20,7 @@ use ASTPP ':all';
 use XML::Simple;
 use Data::Dumper;
 use URI::Escape;
-use strict;
+#use strict;
 
 use vars
   qw($void_xml $cdr_db $params $ASTPP @output $config $freeswitch_db $astpp_db $verbosity );
@@ -230,13 +230,25 @@ if ( $params->{section} eq "dialplan" ) {
     } elsif ($config->{call_max_length} && $maxlength < $config->{call_max_length} / 1000){
 	$maxlength = $config->{call_max_length} / 1000;
     }
+    
+#####################################
+# By : Samir Doshi
+# Purpose : To resolve postpaid billing issue. 
+#####################################
+#     $xml = $ASTPP->fs_dialplan_xml_timelimit(
+#         xml        => $xml,
+#         max_length => $maxlength,
+# 	accountcode => $carddata->{number}
+#     );
 
+      
     $xml = $ASTPP->fs_dialplan_xml_timelimit(
         xml        => $xml,
         max_length => $maxlength,
-	accountcode => $carddata->{number}
+	accountcode => $params->{variable_accountcode}
     );
-
+#####################################
+    
 # Set the timelimit as well as other variables which are needed in the dialplan.
     my $timelimit =
       "L(" . sprintf( "%.0f", $maxlength * 60 * 1000 ) . ":60000:30000)";
@@ -286,7 +298,8 @@ if ( $params->{section} eq "dialplan" ) {
 	    	}
 	        $xml .= $ASTPP->fs_dialplan_xml_bridge_end() if @outboundroutes;
 	}
-	$xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );
+	$xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );	
+	
 	$ASTPP->debug( debug => $xml );
 	print $xml;
 }
