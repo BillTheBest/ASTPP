@@ -115,6 +115,10 @@ install_images:
 		echo $$x;\
 		install -m 644 $$x $(DESTDIR)$(WWWDIR)/html/_astpp/; \
 	done
+	for x in images/*.gif; do \
+		echo $$x;\
+		install -m 644 $$x $(DESTDIR)$(WWWDIR)/html/_astpp/; \
+	done
 	
 resolve_dep:
 	
