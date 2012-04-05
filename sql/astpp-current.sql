@@ -803,6 +803,10 @@ INSERT INTO system (name, value, comment, timestamp) VALUES (
 INSERT INTO system (name, value, comment, timestamp) VALUES (
 'thirdlane_mods','0','Provides a few different modifications across the rating code to work better with Thirdlane(tm) cdrs.','');
 
+--Calling Card ANI Based Authentication variable for FS
+INSERT INTO system (name, value, comment, timestamp) VALUES (
+'cc_ani_auth','1','Calling card ANI authentiation. 0 for disable and 1 for enable','');
+
 --
 -- Enough Configuration settings
 --

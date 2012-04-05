@@ -4491,7 +4491,7 @@ sub vendor_process_rating() {  #Rate Vendor calls.
 sub update_list_cards() {
     my ($astpp_db, $config, $sweep) = @_;
     my ( $sql, @cardlist, $row );
-    if ((!$sweep || $sweep eq "") && $sweep != 0) {
+    if (!$sweep || $sweep eq "") {
         $sql =
           $astpp_db->prepare(
 "SELECT number FROM accounts WHERE status < 2 AND (reseller IS NULL OR reseller = '') AND posttoexternal = 0 "
@@ -5043,7 +5043,32 @@ sub get_callshop() {
     return $accountdata;
 }
 
+#Return ANI Data
+sub get_ani_map() {
+    my ( $astpp_db, $ani_number, $config ) = @_;
+    my ( $sql,$tmp,$anidata );
+    $tmp =
+       "SELECT * FROM ani_map WHERE number = "
+          . $astpp_db->quote($ani_number);
+    print STDERR "$tmp\n" if $config->{debug} == 1;
+    $sql = $astpp_db->prepare($tmp);
+    $sql->execute;
+    $anidata = $sql->fetchrow_hashref;
+    $sql->finish;
+    return $anidata;
+}
 
-
-1;
-
+#Return callingcard cardnumber. Using in ANI Based authentications.
+sub get_cardnumber(){
+    my ( $astpp_db, $account,$number, $config ) = @_;
+    my ( $sql,$tmp,$ccdata );
+    $tmp =
+       "SELECT * FROM callingcards WHERE (account = "
+          . $astpp_db->quote($account)." OR account = ".$astpp_db->quote($number).")";
+    print STDERR "$tmp\n" if $config->{debug} == 1;
+    $sql = $astpp_db->prepare($tmp);
+    $sql->execute;
+    $ccdata = $sql->fetchrow_hashref;
+    $sql->finish;
+    return $ccdata;
+}

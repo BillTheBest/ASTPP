@@ -555,8 +555,10 @@ sub print_console()    #Dump string to the console
 ################# Program Starts Here #################################
 my ( $cardnum, $pin, $destination, $connectsurcharge, $perminsurcharge, $brand )
   = @ARGV;
+  
+#Defined more variableds ($ani_number,  $aniinfo, $accinfo) for CC ANI Authentication 
 my ( $retries, $cardinfo, $numberinfo, $pricelistinfo, @outboundroutes,
-    $callstart );
+    $callstart, $ani_number,  $aniinfo, $accinfo);
 $session->answer();
 &initialize;
 my $vars = $session->getVariable("answered_time");
@@ -567,6 +569,21 @@ return 1 if ( !$session->ready() );
 
 $cardnum = $session->getVariable("callingcard_number");
 
+# If cc_ani_auth=1 means calling card ANI authentication is enabled. 
+if($config->{cc_ani_auth}==1 && $cardnum=='')
+{
+    $ASTPP->debug(
+        debug     => "ANI based authentication",
+        verbosity => $verbosity
+    );
+    $ani_number = $session->getVariable("caller_id_number");    
+    $aniinfo = &get_ani_map( $astpp_db, $ani_number, $config );    
+    $accinfo = &get_account($astpp_db,$aniinfo->{account},'0');    
+    $cardinfo = &get_cardnumber( $astpp_db, $accinfo->{cc},$accinfo->{number}, $config );    
+    $cardnum = $cardinfo->{cardnumber};
+    $cardinfo->{pin} = 'NULL';    
+}
+######################################
 
 if ( $cardnum && $cardnum > 0 ) {
     $ASTPP->debug(
