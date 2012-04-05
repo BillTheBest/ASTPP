@@ -444,7 +444,7 @@ sub build_list_cards() {
 		  $astpp_db->prepare( "SELECT * FROM callingcards WHERE cardnumber = "
 			  . $astpp_db->quote( $params->{number} )
 			  . " AND ( account = "
-			  . $astpp_db->quote( $params->{username} )." OR (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} )."))" );
+			  . $astpp_db->quote( $params->{username} )." OR account IN (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} )."))" );
 		$sql->execute
 		  || return gettext(
 			"Something is wrong with the callingcards database!")
@@ -478,7 +478,7 @@ sub build_list_cards() {
 		my $tmp = 
 			    "SELECT cardnumber FROM callingcards WHERE (account = "
 			  . $astpp_db->quote( $params->{username} )  
-			  . " OR (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} ).")) AND status < 2";		  		  
+			  . " OR account IN (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} ).")) AND status < 2";
 		print STDERR "$tmp \n" if $config->{debug} == 1;
 		$sql =
 		  $astpp_db->prepare($tmp);
@@ -494,7 +494,7 @@ sub build_list_cards() {
 		print STDERR "$tmp \n" if $config->{debug} == 1;
 		$tmp = "SELECT * FROM callingcards WHERE ( account = "
 			  . $astpp_db->quote( $params->{username} )
-			  . " OR (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} ).")) AND status < 2 ORDER BY id limit $params->{limit} , $results_per_page";
+			  . " OR account IN (SELECT cc FROM accounts where number=".$astpp_db->quote( $params->{username} ).")) AND status < 2 ORDER BY id limit $params->{limit} , $results_per_page";
 		print STDERR "$tmp \n" if $config->{debug} == 1;
 		$sql =
 		  $astpp_db->prepare($tmp); 
