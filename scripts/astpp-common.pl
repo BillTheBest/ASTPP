@@ -3751,7 +3751,11 @@ sub max_length() {
 		return (1,0);
 	}
 	print STDERR "Found pattern: $numdata->{pattern}\n" if $config->{debug} == 1;
-	$credit = &accountbalance( $astpp_db, $carddata->{number} ); # Find the available credit to the customer.
+	$credit = &accountbalance( $astpp_db, $carddata->{number} ); # Find the available credit to the customer.	
+	
+	#To Resolve credit limit issue
+	$credit = $credit * 10000;	
+	
 	print STDERR "Account Balance: " . $credit * 10000 . "\n"  if $config->{debug} == 1;
 	$credit_limit = $carddata->{credit_limit} * 10000;
 	print STDERR "Credit Limit: " . $credit_limit . "\n" if $config->{debug} == 1;
