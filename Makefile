@@ -22,6 +22,8 @@ OWNER=root
 GROUP=root
 WWWDIR=/var/www
 
+BIT=$(shell uname -m)
+
 all: install
 
 install_misc:
@@ -122,7 +124,7 @@ install_images:
 	
 resolve_dep:
 	
-	yum -y install autoconf automake bzip2 cpio curl curl-devel curl-devel expat-devel fileutils gcc-c++ gettext-devel gnutls-devel libjpeg-devel libogg-devel libtiff-devel libtool libvorbis-devel make ncurses-devel nmap openssl openssl-devel openssl-devel perl patch unixODBC unixODBC-devel unzip wget zip zlib zlib-devel git libxml2 libxml2-devel mysql mysql-server mysql-devel
+	yum -y install autoconf automake bzip2.$(BIT) cpio.$(BIT) curl.$(BIT) curl-devel.$(BIT) curl-devel.$(BIT) expat-devel.$(BIT) fileutils gcc-c++ gettext-devel.$(BIT) gnutls-devel.$(BIT) libogg-devel.$(BIT) libtiff-devel.$(BIT) libtool.$(BIT) libvorbis-devel.$(BIT) make.$(BIT) nmap.$(BIT) openssl openssl-devel perl.$(BIT) patch.$(BIT) unixODBC.$(BIT) unixODBC-devel.$(BIT) unzip.$(BIT) wget.$(BIT) zip.$(BIT) zlib.$(BIT) zlib-devel.$(BIT) libxml2.$(BIT) libxml2-devel.$(BIT) mysql.$(BIT) mysql-server.$(BIT) mysql-devel.$(BIT) httpd.$(BIT) httpd-devel$(BIT)
 	
 	cpan -i Bundle::CPAN;
 	cpan -i ExtUtils::CBuilder;
